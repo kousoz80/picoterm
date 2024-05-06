@@ -30,7 +30,8 @@ char *s1 = "\";\rf = open(\"./main.py\", \"w\")\rf.write(prog)\rf.close()\r";
 // 選択することができる。
  
 void _PSTART();
-void _460789948_in();
+void _48877223_in();
+void _1206603934_in();
 int ARGC;
 char **ARGV;
 int main(int argc, char** argv){
@@ -40,13 +41,13 @@ _PSTART();
 return 0;
 }
 void _PSTART(){
-_460789948_in();
+_1206603934_in();
+_48877223_in();
 }
-void _460789948_in(){
-// 通信プログラム
+void _48877223_in(){
+// ターミナルモード
+  if(ARGC<2) exit(0);
 
-
-  if(ARGC<2) return;
 
   // 現在の端末設定を取得
   if(tcgetattr(fileno(stdin), &save_term) == -1){
@@ -188,4 +189,50 @@ printf("start picoterm:\n");
   if(tcsetattr(fileno(stdin), TCSANOW, &save_term) == -1){
     printf("tcsetattr(save_term) failure\n");
   }
+  exit(0);
+}
+void _1206603934_in(){
+// コマンド実行モード
+  if(ARGC<4) exit(0);
+  if(strcmp(ARGV[2],"--command")!=0) exit(0);
+
+
+  // Open modem device for reading and writing */
+  fd=open(ARGV[1], O_RDWR | O_NOCTTY | O_NONBLOCK);
+  if(fd < 0) {printf("open error\n"); return;}
+
+  //load configuration
+  tcgetattr(fd,&tio);
+  tio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  cfsetispeed(&tio, BAUDRATE);  //set baudrate
+  cfsetospeed(&tio, BAUDRATE);
+  tio.c_lflag &= ~(ECHO | ICANON);  //non canonical, non echo back
+  tio.c_cc[VMIN]=0;  //non blocking
+  tio.c_cc[VTIME]=0;
+  cfmakeraw(&tio);  // RAWモード
+  tcsetattr(fd,TCSANOW,&tio);  //store configuration
+
+
+  // clean the modem line and activate the settings for the port
+  tcflush(fd, TCIFLUSH);
+  ioctl(fd, TCSETS, &tio);
+
+  for(i = 3; i < ARGC; i++){
+    int j, l;
+    l = strlen(ARGV[i]);
+    for(j = 0; j < l; j++){
+      inbuf = ARGV[i][j];
+      write(fd, &inbuf, 1);
+    }
+    inbuf = ' ';
+    write(fd, &inbuf, 1);
+  }
+  inbuf=CR;
+  write(fd, &inbuf, 1);
+
+  // デバイスのクローズ
+  close(fd);
+  usleep(1000000);
+
+  exit(0);
 }

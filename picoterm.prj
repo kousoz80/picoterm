@@ -6,7 +6,7 @@
 <y0>0</y0>
 <width>200</width>
 <height>100</height>
-<ID_maker>4</ID_maker>
+<ID_maker>6</ID_maker>
 <objectname>picoterm</objectname>
 <description>新規のアプリケーション</description>
 <プロパティ>
@@ -298,8 +298,8 @@ gtkwave wave.vcd
 </プロパティ>
 <pin>
 <ID>_PSTART</ID>
-<x0>63</x0>
-<y0>428</y0>
+<x0>64</x0>
+<y0>476</y0>
 <width>55</width>
 <height>24</height>
 <text>Start()</text>
@@ -310,17 +310,17 @@ gtkwave wave.vcd
 <ID>_O0</ID>
 <state1>_SINIT</state1>
 <state2>_SINIT</state2>
-<x0>149</x0>
-<y0>430</y0>
-<width>139</width>
-<height>43</height>
+<x0>162</x0>
+<y0>409</y0>
+<width>162</width>
+<height>60</height>
 <inconnectx0>0</inconnectx0>
 <inconnecty0>40</inconnecty0>
 <outconnectx0>0</outconnectx0>
 <outconnecty0>40</outconnecty0>
 <inpintext>in()</inpintext>
 <inpinx0>0</inpinx0>
-<inpiny0>24</inpiny0>
+<inpiny0>40</inpiny0>
 <inpinwidth>40</inpinwidth>
 <inpinheight>20</inpinheight>
 <outpintext>out()</outpintext>
@@ -330,10 +330,9 @@ gtkwave wave.vcd
 <outpinheight>20</outpinheight>
 <inpinlinkcount>1</inpinlinkcount>
 <description></description>
-<codetext>// 通信プログラム
+<codetext>// ターミナルモード
+  if(ARGC&lt;2) exit(0);
 
-
-  if(ARGC&lt;2) return;
 
   // 現在の端末設定を取得
   if(tcgetattr(fileno(stdin), &amp;save_term) == -1){
@@ -475,6 +474,7 @@ printf(&quot;start picoterm:\n&quot;);
   if(tcsetattr(fileno(stdin), TCSANOW, &amp;save_term) == -1){
     printf(&quot;tcsetattr(save_term) failure\n&quot;);
   }
+  exit(0);
 </codetext>
 </operation>
 <relation>
@@ -520,4 +520,78 @@ char *s1 = &quot;\&quot;;\rf = open(\&quot;./main.py\&quot;, \&quot;w\&quot;)\rf
 // 選択することができる。
  </codetext>
 </codeclip>
+<operation>
+<ID>_O4</ID>
+<state1>_SINIT</state1>
+<state2>_SINIT</state2>
+<x0>163</x0>
+<y0>484</y0>
+<width>301</width>
+<height>78</height>
+<inconnectx0>0</inconnectx0>
+<inconnecty0>40</inconnecty0>
+<outconnectx0>0</outconnectx0>
+<outconnecty0>40</outconnecty0>
+<inpintext>in()</inpintext>
+<inpinx0>0</inpinx0>
+<inpiny0>57</inpiny0>
+<inpinwidth>40</inpinwidth>
+<inpinheight>20</inpinheight>
+<outpintext>out()</outpintext>
+<outpinx0>90</outpinx0>
+<outpiny0>40</outpiny0>
+<outpinwidth>40</outpinwidth>
+<outpinheight>20</outpinheight>
+<inpinlinkcount>1</inpinlinkcount>
+<description></description>
+<codetext>// コマンド実行モード
+  if(ARGC&lt;4) exit(0);
+  if(strcmp(ARGV[2],&quot;--command&quot;)!=0) exit(0);
+
+
+  // Open modem device for reading and writing */
+  fd=open(ARGV[1], O_RDWR | O_NOCTTY | O_NONBLOCK);
+  if(fd &lt; 0) {printf(&quot;open error\n&quot;); return;}
+
+  //load configuration
+  tcgetattr(fd,&amp;tio);
+  tio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+  cfsetispeed(&amp;tio, BAUDRATE);  //set baudrate
+  cfsetospeed(&amp;tio, BAUDRATE);
+  tio.c_lflag &amp;= ~(ECHO | ICANON);  //non canonical, non echo back
+  tio.c_cc[VMIN]=0;  //non blocking
+  tio.c_cc[VTIME]=0;
+  cfmakeraw(&amp;tio);  // RAWモード
+  tcsetattr(fd,TCSANOW,&amp;tio);  //store configuration
+
+
+  // clean the modem line and activate the settings for the port
+  tcflush(fd, TCIFLUSH);
+  ioctl(fd, TCSETS, &amp;tio);
+
+  for(i = 3; i &lt; ARGC; i++){
+    int j, l;
+    l = strlen(ARGV[i]);
+    for(j = 0; j &lt; l; j++){
+      inbuf = ARGV[i][j];
+      write(fd, &amp;inbuf, 1);
+    }
+    inbuf = &apos; &apos;;
+    write(fd, &amp;inbuf, 1);
+  }
+  inbuf=CR;
+  write(fd, &amp;inbuf, 1);
+
+  // デバイスのクローズ
+  close(fd);
+  usleep(1000000);
+
+  exit(0);
+</codetext>
+</operation>
+<relation>
+<ID>_R5</ID>
+<pin1name>_PSTART</pin1name>
+<pin2name>_O4</pin2name>
+</relation>
 </xobject>
