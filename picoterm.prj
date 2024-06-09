@@ -6,7 +6,7 @@
 <y0>0</y0>
 <width>200</width>
 <height>100</height>
-<ID_maker>6</ID_maker>
+<ID_maker>7</ID_maker>
 <objectname>picoterm</objectname>
 <description>新規のアプリケーション</description>
 <プロパティ>
@@ -331,7 +331,7 @@ gtkwave wave.vcd
 <inpinlinkcount>1</inpinlinkcount>
 <description></description>
 <codetext>// ターミナルモード
-  if(ARGC&lt;2) exit(0);
+  if(ARGC&lt;2) return;
 
 
   // 現在の端末設定を取得
@@ -457,7 +457,7 @@ printf(&quot;start picoterm:\n&quot;);
      // 通常の文字入力
      else{
        write(fd, &amp;inbuf, 1);
-     if(inbuf == LF){
+       if(inbuf == LF){
          inbuf=CR;
          write(fd, &amp;inbuf, 1);
        }
@@ -545,8 +545,8 @@ char *s1 = &quot;\&quot;;\rf = open(\&quot;./main.py\&quot;, \&quot;w\&quot;)\rf
 <inpinlinkcount>1</inpinlinkcount>
 <description></description>
 <codetext>// コマンド実行モード
-  if(ARGC&lt;4) exit(0);
-  if(strcmp(ARGV[2],&quot;--command&quot;)!=0) exit(0);
+  if(ARGC&lt;4) return;
+  if(strcmp(ARGV[2],&quot;--command&quot;)!=0) return;
 
 
   // Open modem device for reading and writing */
@@ -590,7 +590,7 @@ char *s1 = &quot;\&quot;;\rf = open(\&quot;./main.py\&quot;, \&quot;w\&quot;)\rf
 </codetext>
 </operation>
 <relation>
-<ID>_R5</ID>
+<ID>_R6</ID>
 <pin1name>_PSTART</pin1name>
 <pin2name>_O4</pin2name>
 </relation>

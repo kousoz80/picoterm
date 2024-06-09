@@ -30,8 +30,8 @@ char *s1 = "\";\rf = open(\"./main.py\", \"w\")\rf.write(prog)\rf.close()\r";
 // 選択することができる。
  
 void _PSTART();
-void _48877223_in();
-void _1206603934_in();
+void _1741608787_in();
+void _583816654_in();
 int ARGC;
 char **ARGV;
 int main(int argc, char** argv){
@@ -41,12 +41,12 @@ _PSTART();
 return 0;
 }
 void _PSTART(){
-_1206603934_in();
-_48877223_in();
+_583816654_in();
+_1741608787_in();
 }
-void _48877223_in(){
+void _1741608787_in(){
 // ターミナルモード
-  if(ARGC<2) exit(0);
+  if(ARGC<2) return;
 
 
   // 現在の端末設定を取得
@@ -172,7 +172,7 @@ printf("start picoterm:\n");
      // 通常の文字入力
      else{
        write(fd, &inbuf, 1);
-     if(inbuf == LF){
+       if(inbuf == LF){
          inbuf=CR;
          write(fd, &inbuf, 1);
        }
@@ -191,10 +191,10 @@ printf("start picoterm:\n");
   }
   exit(0);
 }
-void _1206603934_in(){
+void _583816654_in(){
 // コマンド実行モード
-  if(ARGC<4) exit(0);
-  if(strcmp(ARGV[2],"--command")!=0) exit(0);
+  if(ARGC<4) return;
+  if(strcmp(ARGV[2],"--command")!=0) return;
 
 
   // Open modem device for reading and writing */
